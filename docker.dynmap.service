@@ -1,0 +1,22 @@
+[Unit]
+Description=Docker Dynmap service
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=root
+TimeoutStartSec=0
+Restart=always
+RestartSec=10
+ExecStartPre=-/usr/bin/docker exec %n stop
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run \
+  --rm \
+  --name dynmap \
+  -p 80:80/tcp \
+  --mount type=bind,source=/server/data/plugins/dynmap/web,target=/usr/local/apache2/htdocs \
+  -itd \
+  httpd:latest
+
+[Install]
+WantedBy=default.target
